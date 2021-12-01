@@ -1,0 +1,69 @@
+{% extends 'dashboard/base.html' %}
+{% load static %}
+{% block content %}
+<section class="content-header">
+  <div class="container-fluid">
+    <div class="row mb-2">
+      <div class="col-sm-6">
+        <h1>User List</h1>
+      </div>
+      <div class="col-sm-6">
+        <ol class="breadcrumb float-sm-right">
+          <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Home</a></li>
+          <li class="breadcrumb-item active">User List</li>
+        </ol>
+      </div>
+    </div>
+  </div><!-- /.container-fluid -->
+</section>
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+          <div class="col-12">
+            <div class="card">
+              <div class="card-header">
+                
+                <h3 class="card-title">Responsive Hover Table</h3>
+
+                <div class="card-tools">
+                </div>
+              </div>
+              <!-- /.card-header -->
+              <div class="card-body table-responsive p-0">
+                <table class="table table-hover text-nowrap">
+                  <thead>
+                    <tr>
+                      <th>№</th>                      
+                      <th>FIO</th>
+                      <th>Telefon</th>
+                      <th>Holati</th>
+                      <th>Telegram id</th>
+                      <th>Username</th>
+                      <th>O'chirish</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for i in employee %}
+                    <tr>
+                      <td>{{ forloop.counter }}</td>
+                      <td>{{ i.name }}</td>
+                      <td>{{ i.phone }}</td>
+                      <td>Aktiv</td>
+                      <td>{{ i.chat_id }}</td>
+                      {% if i.username %}
+                      <td><a href="https://t.me/{{ i.username }}">{{ i.username }}</a></td>
+                      {% endif %}
+                      <td><a href="{% url 'employee_denied' i.id  %}"><div class="btn btn-block btn-outline-danger ">Delete</div></a></td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+              <!-- /.card-body -->
+            </div>
+            <!-- /.card -->
+          </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

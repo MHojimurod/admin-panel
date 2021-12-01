@@ -1,0 +1,67 @@
+{% extends 'dashboard/base.html' %}
+{% load static %}
+{% block content %}
+<section class="content-header">
+  <div class="container-fluid">
+    <div class="row mb-2">
+      <div class="col-sm-6">
+        <h1>Faculty List</h1>
+      </div>
+      <div class="col-sm-6">
+        <ol class="breadcrumb float-sm-right">
+          <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Home</a></li>
+          <li class="breadcrumb-item active">Faculty List</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+          <div class="col-12">
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title">Responsive Hover Table</h3>
+
+                <div class="card-tools">
+                    <a href="{% url 'dashboard' %}"><div class="btn btn-block btn-outline-success">Add</div></a>
+                </div>
+              </div>
+
+              <div class="card-body table-responsive p-0">
+                <table class="table table-hover text-nowrap">
+                  <thead>
+                    <tr>
+                      <th>№</th>
+                      <th>FIO</th>
+                      <th>Telefon</th>
+                      <th>Holati</th>
+                      <th>Telegram id</th>
+                      <th>Username</th>
+                      <th>Accept</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for i in employee %}
+                    <tr>
+                      <td>{{ forloop.counter }}</td>
+                      <td>{{ i.name }}</td>
+                      <td>{{ i.phone }}</td>
+                      <td>Rad etildi</td>
+                      <td>{{ i.chat_id }}</td>
+                      <td>{{ i.username }}</td>
+                      <td><a href="{% url 'employee_accept' i.id %}"><div class="btn btn-block btn-outline-success">Accept</div></a></td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+              <!-- /.card-body -->
+            </div>
+            <!-- /.card -->
+          </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
