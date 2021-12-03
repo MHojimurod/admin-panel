@@ -21,15 +21,25 @@
 
     <div class="user-panel mt-3 pb-3 mb-3 d-flex">
       <div class="image">
+        {% if user.username != "" %}
         <img src="{% static 'dashboard/img/user2-160x160.jpg' %}" class="img-circle elevation-2" alt="User Image">
+        {% else %}
+        <img src="{{tg_photo}}" class="img-circle elevation-2" alt="User Image">
+        {% endif %}
       </div>
       <div class="info">
-        <a href="" class="d-block">{{ user.username }}</a>
+        <a target="_blank" href="{{tg_url}}" class="d-block">{{ user.username }} {{tg_user}}</a>
       </div>
     </div>
     <nav class="mt-2">
       <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
          </li>
+         <li class="nav-item">
+          <a href="{% url 'admins' %}" class="nav-link {{a_active}}">
+            <i class="nav-icon far fa-image"></i>
+            <p>Adminlar</p>
+          </a>
+        </li>
          <li class="nav-item">
           <a href="{% url 'employee_list' %}" class="nav-link {{u_active}}">
             <i class="nav-icon far fa-image"></i>
@@ -52,10 +62,12 @@
         
 
         <li class="nav-item">
+          {% if user.login %}
           <a href="{% url 'logout' %}" class="nav-link">
             <i class="nav-icon far fa-image "></i>
             <i class="fa-sign-out"></i>
             <p>Logout</p>
+            {% endif %}
           </a>
         </li>
       </ul>

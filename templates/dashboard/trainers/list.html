@@ -37,7 +37,6 @@
                       <th> FIO</th>
                       <th>Telefon</th>
                       <th>Holati</th>
-                      <th>Telegram id</th>
                       <th>Username</th>
                       <th>Accept</th>
                       <th>Deny</th>
@@ -49,12 +48,16 @@
                       <td>{{ forloop.counter }}</td>
                       <td>{{ i.name }}</td>
                       <td>{{ i.phone }}</td>
-                      <td>Kitlmoqda</td>
-                      <td>{{ i.chat_id }}</td>
-                      <td>{{i.username}}</td>
-                      <td><a href="{% url 'employee_accept' i.id  %}"><div class="btn btn-block btn-outline-success">Accept</div></a></td>
-                      <td><a href="{% url 'employee_denied' i.id  %}"><div class="btn btn-block btn-outline-danger ">Deny</div></a></td>
+                      <td>Kutilmoqda</td>
+                      <td><a target="_blank" href="https://t.me/{{i.username}}">{{i.username}}</a></td>
+                      {% if is_admin or not user.is_anonymous %}
+                      <td><a href="{% url 'employee_accept' i.id  %}"><div class="btn btn-block btn-outline-success col-5">Accept</div></a></td>
+                      <td><a href="{% url 'employee_denied' i.id  %}"><div class="btn btn-block btn-outline-danger col-5">Deny</div></a></td>
+                      {% else %}
+                      <td><div class="btn btn-block btn-outline-success disabled col-5">Accept</div></td>
+                      <td><div class="btn btn-block btn-outline-danger disabled col-5">Deny</div></td>
                     </tr>
+                    {% endif %}
                     {% endfor %}
                   </tbody>
                 </table>

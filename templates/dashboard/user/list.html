@@ -39,6 +39,7 @@
                       <th>Holati</th>
                       <th>Telegram id</th>
                       <th>Username</th>
+                      <th>Admin</th>
                       <th>O'chirish</th>
                     </tr>
                   </thead>
@@ -53,7 +54,22 @@
                       {% if i.username %}
                       <td><a href="https://t.me/{{ i.username }}">{{ i.username }}</a></td>
                       {% endif %}
-                      <td><a href="{% url 'employee_denied' i.id  %}"><div class="btn btn-block btn-outline-danger ">Delete</div></a></td>
+                      {% if is_admin or not user.is_anonymous  %}
+                      
+                      <td>
+                        <a href="{% url 'update_admin' pk=i.id stat=1 %}"><div class="btn col-5 btn-block btn-outline-primary">Admin</div></a>
+                      </td>
+                      <td>
+                        <a href="{% url 'employee_denied' i.id  %}"><div class="btn col-5 btn-block btn-outline-danger ">Delete</div></a>
+                      </td>
+                      {% else %}
+                      <td>
+                        <div class="btn col-5 btn-block btn-outline-primary disabled">Admin</div>
+                      </td>
+                      <td>
+                        <div class="btn col-5 btn-block btn-outline-danger disabled">Delete</div>
+                      </td>
+                      {% endif %}
                     </tr>
                     {% endfor %}
                   </tbody>

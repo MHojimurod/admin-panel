@@ -37,7 +37,6 @@
                       <th>FIO</th>
                       <th>Telefon</th>
                       <th>Holati</th>
-                      <th>Telegram id</th>
                       <th>Username</th>
                       <th>Accept</th>
                     </tr>
@@ -49,9 +48,14 @@
                       <td>{{ i.name }}</td>
                       <td>{{ i.phone }}</td>
                       <td>Rad etildi</td>
-                      <td>{{ i.chat_id }}</td>
                       <td>{{ i.username }}</td>
-                      <td><a href="{% url 'employee_accept' i.id %}"><div class="btn btn-block btn-outline-success">Accept</div></a></td>
+                      <td>
+                        {% if i.is_admin %}
+                        <a href="{% url 'employee_accept' i.id %}"><div class="btn btn-block btn-outline-success">Accept</div></a>
+                        {% else %}
+                        <div class="btn btn-block btn-outline-success disabled">Accept</div>
+                        {% endif %}
+                      </td>
                     </tr>
                     {% endfor %}
                   </tbody>

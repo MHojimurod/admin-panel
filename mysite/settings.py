@@ -23,7 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-ydq+l1o_03=y+80v8-#znl)t323v%#i_u$1&6=jqk^sl+!+nmg'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
@@ -64,6 +64,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'myapp.context_processors.check_admin',   
+                'myapp.context_processors.check_user',   
             ],
         },
     },
@@ -129,3 +131,14 @@ else:
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+SOCIAL_AUTH_TELEGRAM_BOT_TOKEN =str('2136261295:AAGRm85AIjpG6hspmOwNtNUgPX_F6EJ7pUA')
+# SOCIAL_AUTH_TELEGRAM_BOT_TOKEN =str('2102716966:AAEpMDNpkzKniwBRMJFphy8h-ERYfAQgB4I')
+
+LOGIN_REDIRECT_URL = ('http://084d-82-215-101-34.ngrok.io/')
+
+AUTHENTICATION_BACKENDS = (
+    'social_core.backends.telegram.TelegramAuth',
+    'django.contrib.auth.backends.ModelBackend',
+)
