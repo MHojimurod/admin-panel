@@ -25,7 +25,6 @@
                 <h3 class="card-title">Responsive Hover Table</h3>
 
                 <div class="card-tools">
-                    <a href="{% url 'course_add' %}"><div class="btn btn-block btn-outline-success">Add</div></a>
                 </div>
               </div>
 
@@ -34,22 +33,23 @@
                   <thead>
                     <tr>
                       <th>№</th>
-                      <th>Title</th>
-                      <th>Vote</th>
-                      <th>Created_at</th>
-                      <th>Edit</th>
-                      <th>Delete</th>
+                      <th>FIO</th>
+                      <th>Telefon</th>
+                      <th>Holati</th>
+                      <th>Username</th>
+                      <th>O'chirish</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {% for i in course %}
+                    {% for i in employee %}
                     <tr>
                       <td>{{ forloop.counter }}</td>
-                      <td>{{ i.title }}</td>
-                      <td>{{ i.vote }}</td>
-                      <td>{{ i.created_at }}</td>
-                      <td><a href="{% url 'course_edit' pk=i.id %}"><div class="btn btn-block btn-outline-warning">Edit</div></a></td>
-                      <td><a href="{% url 'course_delete' pk=i.id %}"><div class="btn btn-block btn-outline-danger">Delete</div></a></td>
+                      <td>{{ i.name }}</td>
+                      <td>{{ i.phone }}</td>
+                      <td>Karzinka</td>
+                      <td>{{  i.username}}</td>
+                      <td><a href="{% url 'update_status_back' pk=i.id %}"><div class="btn btn-block btn-outline-warning">Qaytarish</div></a></td>
+                      <td><a href="{% url 'employee_del' pk=i.id %}"><div class="btn btn-block btn-outline-danger">O'chirish</div></a></td>
                     </tr>
                     {% endfor %}
                   </tbody>

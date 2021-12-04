@@ -25,7 +25,12 @@
                 <h3 class="card-title">Responsive Hover Table</h3>
 
                 <div class="card-tools">
-                    <a href="{% url 'event_add' %}"><div class="btn btn-block btn-outline-success">Add</div></a>
+                  {%if user.is_anonymous or employee.is_admin %}
+                    <a href="{% url 'create_request_type' %}"><div class="btn btn-block btn-outline-success">Qo'shish</div></a>
+                  {% else %}
+                  <div class="btn btn-block btn-outline-success disabled">Qo'shish</div>
+                  {% endif %}
+
                 </div>
               </div>
 
@@ -34,21 +39,23 @@
                   <thead>
                     <tr>
                       <th>№</th>
-                      <th>Title</th>
-                      <th>Created_at</th>
-                      <th>Edit</th>
-                      <th>Delete</th>
+                      <th>Nomi</th>
+                      <th>Yaratuvchi</th>
+                      <th>Holati</th>
+                      <!-- <th>O'chirish</th> -->
                     </tr>
                   </thead>
                   <tbody>
-                    {% for i in events %}
+                    {% for i in data %}
                     <tr>
                       <td>{{ forloop.counter }}</td>
-                      <td>{{ i.title }}</td>
-                      <td>{{ i.created_at }}</td>
-                      <td><a href="{% url 'event_edit' pk=i.id %}"><div class="btn btn-block btn-outline-warning">Edit</div></a></td>
-                      <td><a href="{% url 'event_delete' pk=i.id %}"><div class="btn btn-block btn-outline-danger">Delete</div></a></td>
-                    </tr>
+                      <td>{{ i.name }}</td>
+                      <td>{{ i.user.name }}</td>
+                      {% if i.active %}
+                      <td><input type="checkbox" checked="True" disabled></td>
+                      {% else %}
+                      <td><input type="checkbox" checked="False" disabled></td>
+                    {% endif %}
                     {% endfor %}
                   </tbody>
                 </table>

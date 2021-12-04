@@ -1,61 +1,30 @@
 {% extends 'dashboard/base.html' %}
 {% load static %}
 {% block content %}
-<section class="content-header">
-  <div class="container-fluid">
-    <div class="row mb-2">
-      <div class="col-sm-6">
-        <h1>Product List</h1>
+<div class="card card-primary">
+  <div class="card-header">
+    <h3 class="card-title">So'rovnoma qo'shish</h3>
+  </div>
+  <!-- /.card-header -->
+  <!-- form start -->
+  <form method="post">
+    {% csrf_token %}
+    <div class="card-body">
+      <div class="form- group">
+        <label for="id_name">Nomi</label>
+        <input class="form-control" type="text" name="name" required id="id_name" placeholder="Nomi">
       </div>
-      <div class="col-sm-6">
-        <ol class="breadcrumb float-sm-right">
-          <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Home</a></li>
-          <li class="breadcrumb-item active">Product List</li>
-        </ol>
+      <input type="hidden" value="{{data.id}}" name="user" id="id_user">
+      <div class="form-check">
+        <input type="checkbox" class="form-check-input" name="active" id="id_active">
+        <label class="form-check-label" for="id_active">Holati</label>
       </div>
     </div>
-  </div><!-- /.container-fluid -->
-</section>
-<section class="content">
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-md-12">
-            <div class="card card-primary">
+    <!-- /.card-body -->
 
-              <form method="post" enctype="multipart/form-data">
-                  {% csrf_token %}
-                <div class="card-body">
-                  <div class="form-group">
-                    <label >Event title</label>
-                      {{form.title}}
-                  </div>
-                </div>
-                <div class="card-body">
-                  <div class="form-group">
-                    <label >Event message</label>
-                      {{form.message}}
-                  </div>
-                </div>
-                <div class="card-body">
-                  <div class="form-group">
-                    <label >Event image</label>
-                      {{form.image}}
-                  </div>
-                </div>
-                <div class="card-body">
-                  <div class="form-group">
-                    <label >Event date</label>
-                      {{form.date}}
-                  </div>
-                </div>
-                <div class="card-footer">
-                  <button type="submit" class="btn btn-primary">Submit</button>
-                </div>
-              </form>
-            </div>
-
-          </div>
-        </div>
+    <div class="card-footer">
+      <button type="submit" class="btn btn-primary">Qo'shish</button>
     </div>
-</section>
+  </form>
+</div>
 {% endblock %}

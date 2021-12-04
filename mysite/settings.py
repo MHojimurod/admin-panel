@@ -136,7 +136,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 SOCIAL_AUTH_TELEGRAM_BOT_TOKEN =str('2136261295:AAGRm85AIjpG6hspmOwNtNUgPX_F6EJ7pUA')
 # SOCIAL_AUTH_TELEGRAM_BOT_TOKEN =str('2102716966:AAEpMDNpkzKniwBRMJFphy8h-ERYfAQgB4I')
 
-LOGIN_REDIRECT_URL = ('http://084d-82-215-101-34.ngrok.io/')
+LOGIN_REDIRECT_URL = ('http://6161-82-215-101-34.ngrok.io/')
 
 AUTHENTICATION_BACKENDS = (
     'social_core.backends.telegram.TelegramAuth',

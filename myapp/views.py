@@ -3,9 +3,11 @@ import json
 from django.core.servers.basehttp import WSGIServer
 from django.http.response import JsonResponse
 from django.shortcuts import render, redirect
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth import authenticate, login, logout
-from .models import Employee, RequestTypes
+
+from myapp.forms import RequestTypesForm
+from .models import Employee, RequestTypes, Requests
 from django.contrib.auth.models import User
 from django.contrib import messages
 import datetime
@@ -34,14 +36,14 @@ def dashboard(request):
 def dashboard_login(request: WSGIRequest):
     if not request.user.is_anonymous:
         return redirect('dashboard')
-    if request.POST:
-        username = request.POST.get('username')
-        password = request.POST.get('password')
+    if request.GET:
+        username = request.GET.get('username')
+        password = request.GET.get('password')
         user = authenticate(username=username, password=password)
         if user is not None:
             login(request, user)
             return redirect('dashboard')
-    return render(request, 'dashboard/login.html')
+    return render(request, 'dashboard/login1.html')
 
 
 @login_required_decorator
@@ -56,7 +58,7 @@ def dashboard_logout(request: WSGIRequest):
 def login_employee(request: WSGIRequest):
     token = request.COOKIES.get('user_token')
     user = Employee.objects.filter(token=token)
-    if user.exists() and user.first().status == 1:
+    if user.exists() and user.first().status == 1 or not request.user.is_anonymous:
         return redirect('dashboard')
     data = request.GET.get('id')
     user = Employee.objects.filter(chat_id=data)
@@ -92,6 +94,24 @@ def employee_deny(request):
     return render(request, 'dashboard/faculty/list.html', ctx)
 
 
+def employee_delete(request,pk):
+    Employee.objects.filter(pk=pk).update(status=3)
+    return redirect("employee_list")
+
+def employee_del(request,pk):
+    data = Employee.objects.filter(pk=pk)
+    data.delete()
+    return redirect("employee_delete_list")
+
+def employee_delete_list(request):
+    employee = Employee.objects.order_by('-id').filter(status=3).all()
+    ctx = {
+        'employee': employee,
+        "d_active": 'active'
+    }
+    return render(request, 'dashboard/course/list.html', ctx)
+
+
 # @login_required_decorator
 def update_status_deny(request, pk):
     Employee.objects.filter(pk=pk).update(status=2)
@@ -102,6 +122,9 @@ def update_status_deny(request, pk):
 def update_status_accept(request, pk):
     Employee.objects.filter(pk=pk).update(status=1)
     return redirect("employee_false")
+def update_status_back(request, pk):
+    Employee.objects.filter(pk=pk).update(status=1)
+    return redirect("employee_delete_list")
 
 
 def update_status_api(request):
@@ -132,6 +155,41 @@ def employee_accept_list(request):
 
 def create_request(request: WSGIRequest):
     data = json.loads(request.body.decode('UTF-8'))
+    print(data)
+    print('req_type = RequestTypes.objects.get(data[\'req_type\'])')
+
+    req_type = RequestTypes.objects.get(id=data['req_type'])
+
+    confirmers = []
+    user = Employee.objects.filter(chat_id=data['user'])
+    if user.exists():
+        user = user.first()
+
+    new_req = Requests(req_type=req_type, user=user, template=data['request_template'])
+    new_req.save()
+
+    for coner in data['req_confirmers']:
+        con = Employee.objects.get(id=coner)
+        if con:
+            confirmers.append({
+                "id": con.id,
+                "name": con.name,
+                "chat_id": con.chat_id,
+                "username": con.username
+            })
+            new_req.confirmers.add(con)
+    
+    return JsonResponse({
+        "ok": True,
+        "data": {
+            "id": new_req.id,
+            "confirmers": confirmers,
+            "template": new_req.template
+        }
+    })
+    
+def create_request_user(request):
+    data = json.loads(request.body.decode('UTF-8'))
     data = Employee.objects.create(**data)
     print(data.id, type(data))
     a = {"ok": True,
@@ -153,7 +211,7 @@ def check_user(request: WSGIRequest):
             "username": data[0].username,
             "desc": data[0].desc,
             "status": data[0].status,
-            "is_admin": data[0].is_admin
+            "is_admin": data[0].is_admin,
         })
     return JsonResponse({
         "ok": False,
@@ -216,6 +274,7 @@ def request_types(request: WSGIRequest):
                         "name": i.name,
                         "user": i.user.name,
                         "active": i.active,
+                        "templates": i.templates
 
                     }for i in data
                 ]
@@ -240,7 +299,8 @@ def get_users_list(request: WSGIRequest):
             {
                 "id": user.id,
                 "name": user.name,
-                "username": user.username
+                "username": user.username,
+                "chat_id": user.chat_id,
             } for user in users
         ]
     })
@@ -248,10 +308,182 @@ def get_users_list(request: WSGIRequest):
 
 def create_request_data(request: WSGIRequest):
     data = json.loads(request.body.decode('UTF-8'))
-    data = Employee.objects.create(**data)
-    a = {"ok": True, }
-    return JsonResponse(a)
+    print(data)
+    return JsonResponse({})
 
 
 
+
+def get_request(request: WSGIRequest):
+    data = json.loads(request.body.decode('utf-8'))
+    req = Employee.objects.filter(id=data['req'])
+    if req.exists():
+        return JsonResponse({
+            "ok": True,
+            "data": {
+                "id": req.first().id,
+                "name": req.first().name,
+                "username": req.first().username,
+                "number": req.first().phone
+            }
+        })
+    return JsonResponse({
+        "ok": False,
+        "data":None
+    })
+
+
+
+
+
+def get_confirmers_list(request: WSGIRequest):
+    data =json.loads(request.body.decode('utf-8'))
+    confirmers = []
+    print(data)
+    for coner in data['confirmers']:
+        con = Employee.objects.get(id=coner)
+        if con:
+            confirmers.append({
+                "id": con.id,
+                "name": con.name,
+                "chat_id": con.chat_id,
+                "username": con.username
+            })
+    
+    return JsonResponse({
+        "ok": True,
+        "data": confirmers
+    })
+
+
+def get_request_from_user(request: WSGIRequest):
+    data = json.loads(request.body.decode('utf-8'))
+    req = Requests.objects.get(id=data['req_id'])
+    if req:
+        return JsonResponse({
+            "ok": True,
+            "data": {
+                "id": req.id,
+                "req_type": {
+                    "id": req.req_type.id,
+                    "name": req.req_type.name
+                },
+                "user": {
+                    "id": req.user.id,
+                    "name": req.user.name,
+                    "username": req.user.username,
+                    "chat_id": req.user.chat_id
+                },
+                "confirmers": [{
+                    "id": coner.id,
+                    "name": coner.name,
+                    "username": coner.username
+                } for coner in req.confirmers.all()],
+                "template":req.template,
+                "description": req.desc 
+            }
+        })
+
+
+def test(request: WSGIRequest):
+    return render(request,"dashboard/requests/test.html")
+
+
+
+def create_request_type(request: WSGIRequest):
+    employee = Employee.objects.filter(token=request.COOKIES.get('user_token'))
+    model  = RequestTypes()
+    forms  =RequestTypesForm(request.POST, instance=model)
+    print(request.POST,"AAA")
+    if forms.is_valid():
+        forms.save()
+        return redirect('requests_list')
+    return render(request,"dashboard/events/form.html",{'data':employee.first()})
+
+def requests_list(request: WSGIRequest):
+    employee = Employee.objects.filter(token=request.COOKIES.get('user_token'))
+    data = RequestTypes.objects.order_by('-id').all()
+    return render(request,"dashboard/events/list.html",{"data":data,'employee':employee.first()})
+
+
+def request_status_update(request: WSGIRequest):
+    data = json.loads(request.body.decode('utf-8'))
+    if data:
+        coner = Employee.objects.filter(chat_id=data['chat_id']).first()
+        print('keldi')
+        Requests.objects.filter(pk=data['req_id']).update(status=data['status'], confirmer=coner)
+        return JsonResponse({
+            "ok": True
+        })
+
+    return JsonResponse({
+        "ok":False
+    })
+
+
+
+def get_waiting_sent_requests(request: WSGIRequest):
+    data = json.loads(request.body.decode('utf-8'))
+    user = Employee.objects.filter(chat_id=data['chat_id'])
+    if user.exists():
+        user = user.first()
+        reqs = Requests.objects.filter(user=user.id, status=0)
+        if reqs:
+            return JsonResponse({
+                "ok": True,
+                "data": [
+                    {
+                        "id": req.id,
+                        "template": req.template,
+                        "req_type": {
+                    "id": req.req_type.id,
+                    "name": req.req_type.name
+                },
+                        "confirmers": [{
+                        "id": coner.id,
+                        "name": coner.name,
+                        "username": coner.username
+                    } for coner in req.confirmers.all()],
+                    } for req in reqs
+                ]
+            })
+        return JsonResponse({
+            "ok":False,
+            "error": "requests_not_found",
+        })
+    return JsonResponse({
+        "ok":False,
+        "error": "user_not_found"
+    })
+
+
+def get_waiting_come_requests(request: WSGIRequest):
+    data = json.loads(request.body.decode('utf-8'))
+    user = Employee.objects.filter(chat_id=data['chat_id'])
+    if user.exists():
+        user = user.first()
+        reqs = Requests.objects.filter(Tasdiqlovchilar__in=[user.id])
+        if reqs:
+            return JsonResponse({
+                "ok": True,
+                "data": [
+                    {
+                        "id": req.id,
+                        "template": req.template,
+                        "req_type": req.req_type,
+                        "user":{
+                            "id": req.user.id,
+                            "name": req.user.name,
+                            "chat_id": req.user.chat_id,
+                            "username": req.user.username,
+                        }
+                    } for req in reqs
+                ]
+            })
+        return JsonResponse({
+            "ok":False
+        })
+    return JsonResponse({
+        "ok":False
+    })
 

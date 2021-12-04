@@ -1,17 +1,66 @@
 <!DOCTYPE html>
+{% load static %}
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AdminLTE 3 | Log in</title>
+
+  <!-- Google Font: Source Sans Pro -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="{% static 'dashboard/plugins/fontawesome-free/css/all.min.css' %}">
+  <!-- icheck bootstrap -->
+  <link rel="stylesheet" href="{% static 'dashboard/plugins/icheck-bootstrap/icheck-bootstrap.min.css' %}">
+  <!-- Theme style -->
+  <link rel="stylesheet" href="{% static 'dashboard/dist/css/adminlte.min.css' %}">
 </head>
-<body>
-    {% for i in messages %}
-        {{i}}
-    {% endfor %}
-    <script async src="https://telegram.org/js/telegram-widget.js?15" data-telegram-login="companymanagement_bot" data-size="large" data-auth-url="http://084d-82-215-101-34.ngrok.io/" data-request-access="write"></script>
-    
-    
+<body class="hold-transition login-page">
+    <div class="login-box">
+        <!-- /.login-logo -->
+        <div class="card card-outline card-primary">
+          <div class="card-header text-center">
+            <a href="{% url 'dashboard' %}" class="h1"><b>Admin</b>LTE</a>
+          </div>
+          <div class="card-body">
+            <p class="login-box-msg">Sign in to start your session</p>
+      
+            <form action="{% url 'login' %}"   method="get">
+              {% csrf_token %}
+              <div class="input-group mb-3">
+                <input type="text" class="form-control" name="username" placeholder="Username">
+                <div class="input-group-append">
+                  <div class="input-group-text">
+                    <span class="fas fa-user"></span>
+                  </div>
+                </div>
+              </div>
+              <div class="input-group mb-3">
+                <input type="password" class="form-control" name="password" placeholder="Password">
+                <div class="input-group-append">
+                  <div class="input-group-text">
+                    <span class="fas fa-lock"></span>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-4 mx-auto">
+                  <button type="submit" class="btn btn-primary btn-block">Sign In</button>
+                </div>
+              </div>
+            </form>
+      
+            <div class="social-auth-links text-center mt-2 mb-3">
+                <p>- OR -</p>
+                <script async src="https://telegram.org/js/telegram-widget.js?15" data-telegram-login="companymanagement_bot" data-userpic='false' data-size="large" data-auth-url="http://6161-82-215-101-34.ngrok.io/" data-dark_color="#015b99" data-request-access="write"></script>
+            </div>
+      
+          </div>
+        </div>
+      </div>
+
+<script src="{% static 'dashboard/plugins/jquery/jquery.min.js' %}"></script>
+<script src="{% static 'dashboard/plugins/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+<script src="{% static 'dashboard/dist/js/adminlte.min.js' %}"></script>
 </body>
 </html>

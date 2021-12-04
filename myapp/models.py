@@ -19,7 +19,7 @@ class Employee(models.Model):
     desc = models.TextField()
     status = models.IntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
-    confirmer = models.OneToOneField("self", blank=True, on_delete=models.SET_NULL, null=True)
+    confirmer = models.ForeignKey("self", blank=True, on_delete=models.SET_NULL, null=True)
     is_admin = models.BooleanField(default=False)
     token = models.CharField(max_length=255, default=make_token)
 
@@ -37,6 +37,7 @@ class RequestTypes(models.Model):
     name = models.CharField(max_length=200)
     user = models.ForeignKey(Employee, on_delete=models.SET_NULL, null=True)
     active = models.BooleanField(default=True)
+    template = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     
@@ -45,7 +46,7 @@ class Requests(models.Model):
     user = models.ForeignKey(Employee, on_delete=models.SET_NULL, null=True, related_name="Yuboruvchi")
     status = models.IntegerField(default=0)
     confirmers = models.ManyToManyField(Employee, related_name="Tasdiqlovchilar")
-    confirmer = models.OneToOneField(Employee, on_delete=models.SET_NULL, null=True, related_name="Tasdiqlagan_odam")
+    confirmer = models.ForeignKey(Employee,on_delete=models.SET_NULL, null=True, related_name="Tasdiqlovchi")
     template = models.TextField()
     desc = models.TextField(null=True)
     # created_at = models.DateTimeField(auto_now_add=True)
