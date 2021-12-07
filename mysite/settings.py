@@ -98,7 +98,7 @@ DATABASES = {
 
         'HOST': 'ec2-23-23-133-10.compute-1.amazonaws.com',
 
-        'PORT': '<db_port>',
+        'PORT': '5432',
 
     }
 
