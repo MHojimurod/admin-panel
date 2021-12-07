@@ -274,7 +274,7 @@ def request_types(request: WSGIRequest):
                         "name": i.name,
                         "user": i.user.name,
                         "active": i.active,
-                        "templates": i.templates
+                        "template": i.template
 
                     }for i in data
                 ]
@@ -324,6 +324,7 @@ def get_request(request: WSGIRequest):
                 "id": req.first().id,
                 "name": req.first().name,
                 "username": req.first().username,
+                'chat_id': req.first().chat_id,
                 "number": req.first().phone
             }
         })
