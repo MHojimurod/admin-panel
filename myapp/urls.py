@@ -31,6 +31,10 @@ urlpatterns = [
     path('get_request_from_user/', get_request_from_user),
     path('request_status_update/', request_status_update),
     path('get_waiting_sent_requests/', get_waiting_sent_requests),
-    path('test/',test)
+    path('all_requests/',all_requests,name='all_requests'),
+    path('register_group/',register_group),
+    path('get_group/',get_group),
+    path('get_excel/',get_excel,name='get_excel'),
+
     
 ]

@@ -5,11 +5,12 @@
   <div class="container-fluid">
     <div class="row mb-2">
         <div class="col-sm-6">
-          <h1>Order List</h1>
+          <h1>Adminlar Ro'yxati</h1>
         </div>
         <div class="col-sm-6">
           <ol class="breadcrumb float-sm-right">
-            <li class="breadcrumb-item active">Order List</li>
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Asosiy</a></li>
+            <li class="breadcrumb-item active">Adminlar</li>
           </ol>
         </div>
       </div>
@@ -23,10 +24,10 @@
                   <thead>
                     <tr>
                       <th>№</th>
-                      <th>Name</th>
-                      <th>Status</th>
-                      <th>Created_at</th>
-                      <th>Change_status</th>
+                      <th>FIO</th>
+                      <th>Telefon</th>
+                      <th>Username</th>
+                      <th>Admin</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -40,7 +41,7 @@
                         {% if is_admin or not user.is_anonymous %}
                         <a href="{% url 'update_admin' pk=i.id stat=2 %}"><div class="btn btn-sm btn-danger">Bekor qilish</div></a>
                         {% else %}
-                        <td><div class="btn btn-sm btn-danger disabled">Bekor qilish</div></td>
+                        <div class="btn btn-sm btn-danger disabled">Bekor qilish</div>
                         {% endif %}
                       </td>
                     </tr>

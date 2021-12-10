@@ -1,13 +1,14 @@
 from functools import total_ordering
 import json
+import re
 from django.core.servers.basehttp import WSGIServer
-from django.http.response import JsonResponse
+from django.http.response import FileResponse, JsonResponse
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth import authenticate, login, logout
 
 from myapp.forms import RequestTypesForm
-from .models import Employee, RequestTypes, Requests
+from .models import Employee, Group, RequestTypes, Requests
 from django.contrib.auth.models import User
 from django.contrib import messages
 import datetime
@@ -27,7 +28,7 @@ def login_required_decorator(f):
     return wrapper
 
 
-@login_required_decorator
+# @login_required_decorator
 def dashboard(request):
     # print(request.GET, "id")
     return render(request, 'dashboard/index.html')
@@ -46,7 +47,7 @@ def dashboard_login(request: WSGIRequest):
     return render(request, 'dashboard/login1.html')
 
 
-@login_required_decorator
+# @login_required_decorator
 def dashboard_logout(request: WSGIRequest):
     logout(request)
     res = redirect('login')
@@ -73,7 +74,7 @@ def login_employee(request: WSGIRequest):
         return render(request, "dashboard/login1.html")
 
 
-@login_required_decorator
+# @login_required_decorator
 def employee_list(request):
     employee = Employee.objects.order_by('-id').filter(status=False).all()
     ctx = {
@@ -167,23 +168,12 @@ def create_request(request: WSGIRequest):
 
     new_req = Requests(req_type=req_type, user=user, template=data['request_template'])
     new_req.save()
-
-    for coner in data['req_confirmers']:
-        con = Employee.objects.get(id=coner)
-        if con:
-            confirmers.append({
-                "id": con.id,
-                "name": con.name,
-                "chat_id": con.chat_id,
-                "username": con.username
-            })
-            new_req.confirmers.add(con)
     
     return JsonResponse({
         "ok": True,
         "data": {
             "id": new_req.id,
-            "confirmers": confirmers,
+            "confirmers": [con.json for con in req_type.confirmers.all()],
             "template": new_req.template
         }
     })
@@ -209,7 +199,6 @@ def check_user(request: WSGIRequest):
             "phone": data[0].phone,
             "chat_id": data[0].chat_id,
             "username": data[0].username,
-            "desc": data[0].desc,
             "status": data[0].status,
             "is_admin": data[0].is_admin,
         })
@@ -274,8 +263,9 @@ def request_types(request: WSGIRequest):
                         "name": i.name,
                         "user": i.user.name,
                         "active": i.active,
-                        "template": i.template
-
+                        "template": i.template,
+                        "confirmers": [con.json for con in i.confirmers.all()],
+                        "groups": [gr.json for gr in i.groups.all()]
                     }for i in data
                 ]
             })
@@ -342,7 +332,7 @@ def get_confirmers_list(request: WSGIRequest):
     confirmers = []
     print(data)
     for coner in data['confirmers']:
-        con = Employee.objects.get(id=coner)
+        con = Employee.objects.get(pk=coner['id'])
         if con:
             confirmers.append({
                 "id": con.id,
@@ -375,11 +365,7 @@ def get_request_from_user(request: WSGIRequest):
                     "username": req.user.username,
                     "chat_id": req.user.chat_id
                 },
-                "confirmers": [{
-                    "id": coner.id,
-                    "name": coner.name,
-                    "username": coner.username
-                } for coner in req.confirmers.all()],
+                "confirmers": [coner.json for coner in req.req_type.confirmers.all()],
                 "template":req.template,
                 "description": req.desc 
             }
@@ -412,7 +398,7 @@ def request_status_update(request: WSGIRequest):
     if data:
         coner = Employee.objects.filter(chat_id=data['chat_id']).first()
         print('keldi')
-        Requests.objects.filter(pk=data['req_id']).update(status=data['status'], confirmer=coner)
+        Requests.objects.filter(pk=data['req_id']).update(status=data['status'], confirmer=coner,desc=data['desc'])
         return JsonResponse({
             "ok": True
         })
@@ -488,3 +474,76 @@ def get_waiting_come_requests(request: WSGIRequest):
         "ok":False
     })
 
+
+
+def register_group(request:WSGIRequest):
+    data = json.loads(request.body.decode("utf-8"))
+    print(data)
+    new_group = Group.objects.create(name=data["name"], chat_id=data['chat_id'])
+    return JsonResponse({
+        "ok": True,
+        "data": new_group.json
+    })
+def get_group(request:WSGIRequest):
+    data = json.loads(request.body.decode("utf-8"))
+    gr = Group.objects.get(chat_id=data['chat_id'])
+    if gr:
+        return JsonResponse({
+            "ok": True,
+            "data": gr.json
+        })
+   
+    return JsonResponse({
+            "ok": True,
+            "data": None
+        })
+statuses = ['kutilmoqda', 'Tasdiqlandi', "Rad etildi"]
+
+import xlsxwriter
+def get_excel(request:WSGIRequest):
+    datas = Requests.objects.order_by('-id').all()
+    now = datetime.datetime.now().strftime('%d-%m-%Y-%H-%M-%S')
+    outWorkbook = xlsxwriter.Workbook(f'{now}.xlsx')
+    outSheet = outWorkbook.add_worksheet()
+    outSheet.write("A1", '№')
+    outSheet.write("B1", 'Yuboruvchi')
+    outSheet.write("C1", 'So\'rov Turi')
+    outSheet.write("D1", 'Tasdiqlovchi')
+    outSheet.write("D1", 'Holati')
+    outSheet.write("E1", 'Template')
+    outSheet.write("F1", 'Comment')
+    outSheet.write("G1", 'Sana')
+    for num in range(datas.count()):
+        i = datas[num]
+        print(num)
+        outSheet.write(f"A{num + 2}", f"{str(num)}")
+        outSheet.write_url(f"B{num + 2}", f"https://t.me/{i.user.username if not None else ''}",string=f"{i.user.name}") 
+        outSheet.write(f"C{num + 2}", f"{i.req_type.name}")
+        outSheet.write(f"D{num + 2}", f"{i.confirmer.name if i.confirmer != None else ''}")
+        outSheet.write(f"E{num + 2}", statuses[i.status])
+        outSheet.write(f"E{num + 2}", f"{i.template}")
+        outSheet.write(f"F{num + 2}", f"{i.desc if i.desc else ''}")
+        outSheet.write(f"G{num + 2}", f"{i.created_at.strftime('%d-%m-%Y %H:%M')}")
+    outWorkbook.close()
+    print(outWorkbook.filename)
+    return FileResponse(open(outWorkbook.filename, 'rb'))
+
+
+    
+
+
+def all_requests(request: WSGIRequest):
+    print('aa')
+    token = request.COOKIES.get('user_token')
+    user = Employee.objects.filter(token=token)
+    print(user)
+    if user.exists():
+        print('kelid')
+        status ={
+            0:"Kutilmoqda",
+            1:"Tasdiqlandi",
+            2:"Rad etildi"}
+        user = user.first()
+        data = Requests.objects.order_by('-id').filter(user=user).all()
+
+        return render(request, 'dashboard/all_requests/test.html',{'data':data,"status":status})
