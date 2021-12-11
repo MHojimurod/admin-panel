@@ -96,7 +96,7 @@ def employee_deny(request):
 
 
 def employee_delete(request,pk):
-    Employee.objects.filter(pk=pk).update(status=3)
+    Employee.objects.filter(pk=pk).update(status=3,is_admin=False)
     return redirect("employee_list")
 
 def employee_del(request,pk):
@@ -415,8 +415,10 @@ def get_waiting_sent_requests(request: WSGIRequest):
     if user.exists():
         user = user.first()
         reqs = Requests.objects.filter(user=user.id, status=0)
+        
         if reqs:
-            return JsonResponse({
+            print('aa')
+            data = {
                 "ok": True,
                 "data": [
                     {
@@ -426,14 +428,12 @@ def get_waiting_sent_requests(request: WSGIRequest):
                     "id": req.req_type.id,
                     "name": req.req_type.name
                 },
-                        "confirmers": [{
-                        "id": coner.id,
-                        "name": coner.name,
-                        "username": coner.username
-                    } for coner in req.confirmers.all()],
+                        "confirmer":req.confirmer.name if req.confirmer is not None else "" ,
                     } for req in reqs
                 ]
-            })
+            }
+            print(data,"dfasdf")
+            return JsonResponse(data)
         return JsonResponse({
             "ok":False,
             "error": "requests_not_found",
@@ -536,14 +536,8 @@ def all_requests(request: WSGIRequest):
     print('aa')
     token = request.COOKIES.get('user_token')
     user = Employee.objects.filter(token=token)
-    print(user)
     if user.exists():
-        print('kelid')
-        status ={
-            0:"Kutilmoqda",
-            1:"Tasdiqlandi",
-            2:"Rad etildi"}
         user = user.first()
         data = Requests.objects.order_by('-id').filter(user=user).all()
 
-        return render(request, 'dashboard/all_requests/test.html',{'data':data,"status":status})
+        return render(request, 'dashboard/all_requests/test.html',{'data':data})

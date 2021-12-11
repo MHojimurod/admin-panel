@@ -70,4 +70,4 @@ class Requests(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     @property
     def status_str(self):
-        return ['kutilmoqda', 'Tasdiqlandi', "Rad etildi"][self.status]
+        return ['Kutilmoqda', 'Tasdiqlandi', "Rad etildi"][self.status]
