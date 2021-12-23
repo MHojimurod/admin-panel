@@ -25,7 +25,7 @@
                 <!-- <h3 class="card-title">Responsive Hover Table</h3> -->
 
                 <div class="card-tools">
-                  {%if user.is_anonymous or employee.is_admin %}
+                  {%if not user.is_anonymous or employee.is_admin %}
                     <a href="{% url 'create_request_type' %}"><div class="btn btn-block btn-outline-success">Qo'shish</div></a>
                   {% else %}
                   <div class="btn btn-block btn-outline-success disabled">Qo'shish</div>
@@ -42,6 +42,7 @@
                       <th>Nomi</th>
                       <th>Yaratuvchi</th>
                       <th>Holati</th>
+                      <th>Taxrirlash</th>
                       <!-- <th>O'chirish</th> -->
                     </tr>
                   </thead>
@@ -56,6 +57,7 @@
                       {% else %}
                       <td><input type="checkbox" checked="False" disabled></td>
                     {% endif %}
+                    <td><a  href="{% url 'edit_request' pk=i.id %}"><div class="btn btn-block btn-outline-warning">Taxrirlash</div></a></td>
                     {% endfor %}
                   </tbody>
                 </table>

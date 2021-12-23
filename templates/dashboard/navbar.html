@@ -20,73 +20,76 @@
   <div class="sidebar">
 
     <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+      {% if not user.is_anonymous  %}
       <div class="image">
-        {% if user.username != "" %}
-        <img src="{% static 'dashboard/img/user2-160x160.jpg' %}" class="img-circle elevation-2" alt="User Image">
-        {% else %}
-        <img src="{{tg_photo}}" class="img-circle elevation-2" alt="User Image">
-        {% endif %}
+        <img src="{% static 'dashboard/img/user2-160x160.jpg' %}" class="img-circle elevation-2" alt="User Image"> 
       </div>
       <div class="info">
-        <a target="_blank" href="{{tg_url}}" class="d-block">{{ user.username }} {{tg_user}}</a>
+        <a target="_blank" class="d-block">{{ user.username }}</a>
       </div>
+      {% else %}
+      <div class="image">
+        <img src="{{tg_photo}}" class="img-circle elevation-2" alt="User Image">
+      </div>
+      <div class="info">
+        <a target="_blank" href="{{tg_url}}" class="d-block"> {{tg_user}}</a>
+      </div>
+      {% endif %}
     </div>
     <nav class="mt-2">
       <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
          </li>
          <li class="nav-item">
           <a href="{% url 'admins' %}" class="nav-link {{a_active}}">
-            <i class="nav-icon far fa-image"></i>
+            <i class="nav-icon fas fa-user-shield"></i>
             <p>Adminlar</p>
           </a>
         </li>
          <li class="nav-item">
           <a href="{% url 'employee_list' %}" class="nav-link {{u_active}}">
-            <i class="nav-icon far fa-image"></i>
+            <i class="nav-icon far fa-user"></i>
             <p>Xodimlar</p>
           </a>
         </li>
          <li class="nav-item">
           <a href="{% url 'employee_false' %}" class="nav-link {{t_active}}">
-            <i class="nav-icon far fa-image"></i>
+            <i class="nav-icon far fa-clock"></i>
             <p>Kutilayotganlar</p>
           </a>
         </li>
          </li>
          <li class="nav-item">
           <a href="{% url 'employee_deny' %}" class="nav-link {{f_active}}">
-            <i class="nav-icon far fa-image"></i>
+            <i class="nav-icon fas fa-ban"></i>
             <p>Rad etilganlar</p>
           </a>
         </li>
          <li class="nav-item">
           <a href="{% url 'employee_delete_list' %}" class="nav-link {{d_active}}">
-            <i class="nav-icon far fa-image"></i>
+            <i class="nav-icon fas fa-trash"></i>
             <p>Karzinka</p>
           </a>
         </li>
          <li class="nav-item">
           <a href="{% url 'requests_list' %}" class="nav-link {{r_active}}">
-            <i class="nav-icon far fa-image"></i>
+            <i class="nav-icon far fa-file"></i>
             <p>So'rov Turlari</p>
           </a>
         </li>
        
          <li class="nav-item">
           <a href="{% url 'all_requests' %}" class="nav-link {{r_active}}">
-            <i class="nav-icon far fa-image"></i>
+            <i class="nav-icon far fa-file-excel"></i>
             <p>So'rovlar</p>
           </a>
         </li>
         
 
         <li class="nav-item">
-          {% if user.login %}
           <a href="{% url 'logout' %}" class="nav-link">
-            <i class="nav-icon far fa-image "></i>
+            <i class="nav-icon fas fa-sign-out-alt "></i>
             <i class="fa-sign-out"></i>
             <p>Logout</p>
-            {% endif %}
           </a>
         </li>
       </ul>

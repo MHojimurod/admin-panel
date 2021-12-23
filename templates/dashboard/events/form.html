@@ -11,10 +11,27 @@
     {% csrf_token %}
     <div class="card-body">
       <div class="form- group">
-        <label for="id_name">Nomi</label>
-        <input class="form-control" type="text" name="name" required id="id_name" placeholder="Nomi">
+        <label for="id_name">Nomi</label><br>
+        {{forms.name}}
+        <!-- <input class="form-control" type="text" name="name" required id="id_name" placeholder="Nomi"> -->
       </div>
+      <div class="form- group">
+        <label for="id_name">Template</label><br>
+        {{forms.template}}
+        <!-- <textarea class="form-control mb-3" type="text" name="template" required id="id_template" placeholder="Template"></textarea> -->
+      </div>
+      <div class="form- group">
+        <label for="id_name">Tasdiqlovchilar</label><br>
+        {{forms.confirmers}}
+      </div>
+      <div class="form- group">
+        <label for="id_name">Gruppalar</label><br>
+        {{forms.groups}}
+        <!-- <input class="form-control" type="text" name="groups" required id="id_groups" placeholder="Gruppalar"> -->
+      </div>
+      {% if data %}
       <input type="hidden" value="{{data.id}}" name="user" id="id_user">
+      {% endif %}
       <div class="form-check">
         <input type="checkbox" class="form-check-input" name="active" id="id_active">
         <label class="form-check-label" for="id_active">Holati</label>
