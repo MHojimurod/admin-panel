@@ -53,9 +53,9 @@
                       <td>{{ i.name }}</td>
                       <td>{{ i.user.name }}</td>
                       {% if i.active %}
-                      <td><input type="checkbox" checked="True" disabled></td>
+                      <td><input type="checkbox" checked disabled></td>
                       {% else %}
-                      <td><input type="checkbox" checked="False" disabled></td>
+                      <td><input type="checkbox" disabled></td>
                     {% endif %}
                     <td><a  href="{% url 'edit_request' pk=i.id %}"><div class="btn btn-block btn-outline-warning">Taxrirlash</div></a></td>
                     {% endfor %}

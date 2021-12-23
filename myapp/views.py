@@ -245,7 +245,7 @@ def update_admin(request, pk, stat=None):
 def request_types(request: WSGIRequest):
     check = json.loads(request.body.decode("UTF-8"))["chat_id"]
     if check:
-        data = RequestTypes.objects.all()
+        data = RequestTypes.objects.filter(active=True).all()
         if data:
             return JsonResponse(
                 {
