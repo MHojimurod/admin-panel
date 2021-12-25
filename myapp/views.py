@@ -167,12 +167,7 @@ def create_request(request: WSGIRequest):
     new_req = Requests(req_type=req_type, user=user, template=data["request_template"])
     new_req.save()
 
-    return JsonResponse(
-        {
-            "ok": True,
-            "data": new_req.json
-        }
-    )
+    return JsonResponse({"ok": True, "data": new_req.json})
 
 
 def create_request_user(request):
@@ -335,12 +330,7 @@ def get_request_from_user(request: WSGIRequest):
     data = json.loads(request.body.decode("utf-8"))
     req = Requests.objects.get(id=data["req_id"])
     if req:
-        return JsonResponse(
-            {
-                "ok": True,
-                "data": req.json
-            }
-        )
+        return JsonResponse({"ok": True, "data": req.json})
 
 
 @login_required_decorator
@@ -363,6 +353,7 @@ def create_request_type(request: WSGIRequest):
         {"data": employee.first(), "forms": forms},
     )
 
+
 @login_required_decorator
 def trainer_edit(request, pk):
     employee = Employee.objects.filter(token=request.COOKIES.get("user_token"))
@@ -371,12 +362,9 @@ def trainer_edit(request, pk):
     if request.POST:
         if forms.is_valid():
             forms.save()
-            return redirect('requests_list')
-    ctx = {
-        "data": employee.first(),
-        "forms": forms
-    }
-    return render(request, 'dashboard/events/form.html', ctx)
+            return redirect("requests_list")
+    ctx = {"data": employee.first(), "forms": forms}
+    return render(request, "dashboard/events/form.html", ctx)
 
 
 @login_required_decorator
@@ -418,8 +406,7 @@ def get_waiting_sent_requests(request: WSGIRequest):
             print("aa")
             data = {
                 "ok": True,
-                "data": [req.json for req in reqs
-                ],
+                "data": [req.json for req in reqs],
             }
             print(data, "dfasdf")
             return JsonResponse(data)
@@ -446,7 +433,6 @@ def get_waiting_come_requests(request: WSGIRequest):
             return JsonResponse({"ok": True, "data": datas})
         return JsonResponse({"ok": False})
     return JsonResponse({"ok": False})
-
 
 
 def register_group(request: WSGIRequest):
@@ -484,9 +470,9 @@ def get_excel(request: WSGIRequest):
     outSheet.write("G1", "Comment")
     outSheet.write("H1", "Tasdiqlangan vaqti")
     outSheet.write("I1", "Sana")
-    
+
     for num in range(datas.count()):
-        i:Requests = datas[num]
+        i: Requests = datas[num]
         date: datetime.datetime = i.created_at
         print(f"{date.hour}:{date.minute}:{date.second}")
         outSheet.write(f"A{num + 2}", f"{str(num+1)}")
@@ -502,7 +488,10 @@ def get_excel(request: WSGIRequest):
         outSheet.write(f"E{num + 2}", statuses[i.status])
         outSheet.write(f"F{num + 2}", f"{i.template}")
         outSheet.write(f"G{num + 2}", f"{i.desc if i.desc else ''}")
-        outSheet.write(f"H{num + 2}", f"{i.confirm_date.strftime('%d.%m.%Y %H:%M') if i.confirm_date else ''}")
+        outSheet.write(
+            f"H{num + 2}",
+            f"{i.confirm_date.strftime('%d.%m.%Y %H:%M') if i.confirm_date else ''}",
+        )
         outSheet.write(f"I{num + 2}", f"{i.created_at.strftime('%d.%m.%Y %H:%M')}")
     outWorkbook.close()
     return FileResponse(open(outWorkbook.filename, "rb"))
@@ -516,12 +505,12 @@ def all_requests(request: WSGIRequest):
         user = user.first()
         data = Requests.objects.order_by("-id").all()
 
-        return render(request, "dashboard/all_requests/test.html", {"data": data})
+        return render(request, "dashboard/all_requests/test.html", {"data": data, "user": user})
     else:
         return redirect("login1")
 
 
-def get_confirmed_come_requests(request:WSGIRequest):
+def get_confirmed_come_requests(request: WSGIRequest):
     data = json.loads(request.body.decode("utf-8"))
     user = Employee.objects.filter(chat_id=data["chat_id"])
     datas = []
@@ -529,41 +518,24 @@ def get_confirmed_come_requests(request:WSGIRequest):
         user = user.first()
         reqs = Requests.objects.filter(status=1, confirmer=user)
         print(reqs)
-        return JsonResponse({
-            "ok": True,
-            "data": [
-                req.json for req in reqs
-            ]
-        })
+        return JsonResponse({"ok": True, "data": [req.json for req in reqs]})
     else:
-        return JsonResponse({
-            "ok": False,
-            "error": "user_not_found"
-        })
+        return JsonResponse({"ok": False, "error": "user_not_found"})
 
 
-def get_confirmed_sent_requests(request:WSGIRequest):
+def get_confirmed_sent_requests(request: WSGIRequest):
     data = json.loads(request.body.decode("utf-8"))
     user = Employee.objects.filter(chat_id=data["chat_id"])
     datas = []
     if user.exists():
         user = user.first()
         reqs = Requests.objects.filter(status=1, user=user)
-        return JsonResponse({
-            "ok": True,
-            "data": [
-                req.json for req in reqs
-            ]
-        })
+        return JsonResponse({"ok": True, "data": [req.json for req in reqs]})
     else:
-        return JsonResponse({
-            "ok": False,
-            "error": "user_not_found"
-        })
+        return JsonResponse({"ok": False, "error": "user_not_found"})
 
 
-
-def get_denied_come_requests(request:WSGIRequest):
+def get_denied_come_requests(request: WSGIRequest):
     data = json.loads(request.body.decode("utf-8"))
     user = Employee.objects.filter(chat_id=data["chat_id"])
     datas = []
@@ -571,38 +543,18 @@ def get_denied_come_requests(request:WSGIRequest):
         user = user.first()
         reqs = Requests.objects.filter(status=2, confirmer=user)
         print(reqs)
-        return JsonResponse({
-            "ok": True,
-            "data": [
-                req.json for req in reqs
-            ]
-        })
+        return JsonResponse({"ok": True, "data": [req.json for req in reqs]})
     else:
-        return JsonResponse({
-            "ok": False,
-            "error": "user_not_found"
-        })
+        return JsonResponse({"ok": False, "error": "user_not_found"})
 
 
-def get_denied_sent_requests(request:WSGIRequest):
+def get_denied_sent_requests(request: WSGIRequest):
     data = json.loads(request.body.decode("utf-8"))
     user = Employee.objects.filter(chat_id=data["chat_id"])
     datas = []
     if user.exists():
         user = user.first()
-        reqs = Requests.objects.filter(status=2   
-           , user=user)
-        return JsonResponse({
-            "ok": True,
-            "data": [
-                req.json for req in reqs
-            ]
-        })
+        reqs = Requests.objects.filter(status=2, user=user)
+        return JsonResponse({"ok": True, "data": [req.json for req in reqs]})
     else:
-        return JsonResponse({
-            "ok": False,
-            "error": "user_not_found"
-        })
-
-
-
+        return JsonResponse({"ok": False, "error": "user_not_found"})
