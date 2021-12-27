@@ -131,10 +131,14 @@ def update_status_api(request):
     data = json.loads(request.body.decode("utf-8"))
     print(data)
     if data:
+        
         user = Employee.objects.filter(id=data["rq"]).first()
         print(data)
         user.status = int(data["status"])
         user.confirmer = Employee.objects.filter(id=int(data["admin"])).first()
+        if data.get('desc', None) != None:
+            user.desc = data['desc']
+        user.confirm_date = datetime.datetime.now()
         user.save()
         return JsonResponse({"ok": True, "status": int(data["status"])})
     return JsonResponse({"ok": False})
@@ -338,10 +342,6 @@ def create_request_type(request: WSGIRequest):
     employee = Employee.objects.filter(token=request.COOKIES.get("user_token"))
     model = RequestTypes()
     forms = RequestTypesForm(request.POST, instance=model)
-    print(forms.errors)
-    print(request.POST)
-    print(employee)
-    print(forms.data)
     if forms.is_valid():
 
         print("bbb")
@@ -382,7 +382,6 @@ def request_status_update(request: WSGIRequest):
     data = json.loads(request.body.decode("utf-8"))
     if data:
         coner = Employee.objects.filter(chat_id=data["chat_id"]).first()
-        print("keldi")
         Requests.objects.filter(pk=data["req_id"]).update(
             status=data["status"], confirmer=coner, desc=data["desc"]
         )
@@ -468,8 +467,8 @@ def get_excel(request: WSGIRequest):
     outSheet.write("E1", "Holati")
     outSheet.write("F1", "Template")
     outSheet.write("G1", "Comment")
-    outSheet.write("H1", "Tasdiqlangan vaqti")
-    outSheet.write("I1", "Sana")
+    outSheet.write("H1", "So'rov Tasdiqlangan vaqti")
+    outSheet.write("I1", "So'rov yaratilgan vaqti")
 
     for num in range(datas.count()):
         i: Requests = datas[num]
