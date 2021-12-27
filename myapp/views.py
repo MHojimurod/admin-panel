@@ -136,9 +136,7 @@ def update_status_api(request):
         print(data)
         user.status = int(data["status"])
         user.confirmer = Employee.objects.filter(id=int(data["admin"])).first()
-        if data.get('desc', None) != None:
-            user.desc = data['desc']
-        user.confirm_date = datetime.datetime.now()
+        
         user.save()
         return JsonResponse({"ok": True, "status": int(data["status"])})
     return JsonResponse({"ok": False})
@@ -383,7 +381,7 @@ def request_status_update(request: WSGIRequest):
     if data:
         coner = Employee.objects.filter(chat_id=data["chat_id"]).first()
         Requests.objects.filter(pk=data["req_id"]).update(
-            status=data["status"], confirmer=coner, desc=data["desc"]
+            status=data["status"], confirmer=coner, desc=data["desc"], confirm_date=datetime.datetime.now()
         )
 
         req = Requests.objects.filter(pk=data["req_id"]).first()
