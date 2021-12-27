@@ -102,7 +102,7 @@ class Requests(models.Model):
             "status": self.status,
             "confirmer": self.confirmer.json if self.confirmer != None else None,
             "template": self.template,
-            "description":self.desc,
+            "desc":self.desc,
             "confirm_data": self.confirm_date,
             "sent_date": self.created_at
         }
